@@ -1,5 +1,7 @@
 # PostgreSQL container
 
+The `postgres-7` tag is a development build of this fork for `linux/amd64`, not an official Mautic release. The `sha-<commit>` tag and published digest identify a specific build.
+
 This image builds the fork's locked PHP dependencies, CKEditor, GrapesJS and production assets from source. It runs Apache with PHP 8.3 and PostgreSQL 18 client tools, supporting PostgreSQL 16 and 18 servers. It contains no database or site credentials. Startup prepares writable directories; installation and migrations are explicit operations.
 
 ## Start a new site
