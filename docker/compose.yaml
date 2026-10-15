@@ -1,0 +1,46 @@
+services:
+  mautic:
+    image: ${MAUTIC_IMAGE:-ghcr.io/mihazs/mautic-pg:postgres-7}
+    ports:
+      - "127.0.0.1:${MAUTIC_HTTP_PORT:-8080}:80"
+    environment:
+      MAUTIC_DB_DRIVER: pdo_pgsql
+      MAUTIC_DB_HOST: postgres
+      MAUTIC_DB_PORT: "5432"
+      MAUTIC_DB_NAME: mautic
+      MAUTIC_DB_USER: mautic
+      MAUTIC_DB_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      MAUTIC_DB_CHARSET: UTF8
+      MAUTIC_SECRET_KEY: ${MAUTIC_SECRET_KEY:?Set MAUTIC_SECRET_KEY in .env}
+    volumes:
+      - config:/var/www/html/config
+      - files:/var/www/html/media/files
+      - images:/var/www/html/media/images
+      - logs:/var/www/html/var/logs
+      - spool:/var/www/html/var/spool
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+  postgres:
+    image: postgres:${POSTGRES_MAJOR:-18}-bookworm
+    environment:
+      PGDATA: /var/lib/postgresql/storage
+      POSTGRES_DB: mautic
+      POSTGRES_USER: mautic
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - database:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mautic -d mautic"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+volumes:
+  config:
+  files:
+  images:
+  logs:
+  spool:
+  database:
